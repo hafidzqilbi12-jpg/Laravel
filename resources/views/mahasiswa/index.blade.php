@@ -11,7 +11,22 @@
 </head>
 
 <body>
-    <h1>Data Mahasiswa</h1> @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('mahasiswa.create') }}">Tambah Mahasiswa</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
+    <h1>Data Mahasiswa</h1> 
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('mahasiswa.create') }}">Tambah Mahasiswa</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
     <table>
         <thead>
             <tr>
@@ -26,20 +41,46 @@
             </tr>
         </thead>
         <tbody> @forelse ($mahasiswa as $mhs) <tr>
-                <td>{{ $loop->iteration }}</td>
+                <td>{{ $mahasiswa->firstItem() + $loop->index }}</td>
                 <td>{{ $mhs->nim }}</td>
                 <td>{{ $mhs->nama }}</td>
                 <td>{{ $mhs->jurusan }}</td>
                 <td>{{ $mhs->angkatan }}</td>
                 <td>{{ $mhs->email }}</td>
                 <td>{{ $mhs->kelas->nama_kelas ?? '-' }}</td>
-                <td> <a href="{{ route('mahasiswa.edit', $mhs->id) }}" class="btn">Ubah</a>
-                    <form action="{{ route('mahasiswa.destroy', $mhs->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus data mahasiswa ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
+                <td>
+                    @role('admin')
+                    <a href="{{ route('mahasiswa.edit', $mhs->id) }}"
+                        class="btn">
+                        Ubah
+                    </a>
+
+                    <form action="{{ route('mahasiswa.destroy', $mhs->id) }}"
+                        method="POST">
+                        @csrf
+                        @method('DELETE')
+
+                        <button type="submit">
+                            Hapus
+                        </button>
+                    </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
-            </tr> @empty <tr>
-                <td colspan="8">Belum ada data mahasiswa.</td>
-            </tr> @endforelse </tbody>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="8">
+                    Belum ada data mahasiswa.
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
     </table>
+
+    {{ $mahasiswa->links('pagination.custom') }}
+
 </body>
 
 </html>

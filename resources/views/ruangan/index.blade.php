@@ -12,7 +12,20 @@
 
 <body>
     <h1>Data Ruangan</h1>
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
 
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
     @if (session('success'))
     <p class="success">{{ session('success') }}</p>
     @endif
@@ -53,6 +66,7 @@
                 <td>{{ $r->kapasitas }}</td>
                 <td>{{ $r->is_lab ? 'Ya' : 'Tidak' }}</td>
                 <td>
+                    @role('admin')
                     <a href="{{ route('ruangan.edit', $r->id) }}" class="btn">Ubah</a>
 
                     <form
@@ -64,6 +78,9 @@
                         @method('DELETE')
                         <button type="submit">Hapus</button>
                     </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
             </tr>
             @empty

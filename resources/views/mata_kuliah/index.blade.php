@@ -11,7 +11,22 @@
 </head>
 
 <body>
-    <h1>Data Mata Kuliah</h1> @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('mata-kuliah.create') }}">Tambah Mata Kuliah</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
+    <h1>Data Mata Kuliah</h1>
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('mata-kuliah.create') }}">Tambah Mata Kuliah</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
     <table>
         <thead>
             <tr>
@@ -29,8 +44,13 @@
                 <td>{{ $mk->nama_mata_kuliah }}</td>
                 <td>{{ $mk->sks }}</td>
                 <td>{{ $mk->semester }}</td>
-                <td> <a href="{{ route('mata-kuliah.edit', $mk->id) }}" class="btn">Ubah</a>
+                <td>
+                    @role('admin')
+                    <a href="{{ route('mata-kuliah.edit', $mk->id) }}" class="btn">Ubah</a>
                     <form action="{{ route('mata-kuliah.destroy', $mk->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus data mata kuliah ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
             </tr> @empty <tr>
                 <td colspan="6">Belum ada data mata kuliah.</td>

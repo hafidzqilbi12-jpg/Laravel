@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\JadwalKuliahController;
 use App\Http\Controllers\KelasController;
@@ -8,17 +9,63 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\RuanganController;
 
-Route::get('/', function () {
-    return view('welcome');
+// Route login (hanya tamu)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])
+        ->name('login');
+
+    Route::post('/login', [AuthController::class, 'login']);
+});
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+// KHUSUS ADMIN (create, edit, update, delete)
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::resource('mahasiswa', MahasiswaController::class)
+        ->except(['index', 'show']);
+
+    Route::resource('dosen', DosenController::class)
+        ->except(['index', 'show']);
+
+    Route::resource('mata-kuliah', MataKuliahController::class)
+        ->except(['index', 'show']);
+
+    Route::resource('ruangan', RuanganController::class)
+        ->except(['index', 'show']);
+
+    Route::resource('kelas', KelasController::class)
+        ->parameters([
+            'kelas' => 'kls',
+        ])
+        ->except(['index', 'show']);
+
+    Route::resource('jadwal-kuliah', JadwalKuliahController::class)
+        ->except(['index', 'show']);
 });
 
-Route::resource('mahasiswa', MahasiswaController::class);
-Route::resource('dosen', DosenController::class);
-Route::resource('mata-kuliah', MataKuliahController::class);
-Route::resource('ruangan', RuanganController::class);
+// SEMUA USER LOGIN(read-only: index & show)
+Route::middleware('auth')->group(function () {
 
-Route::resource('kelas', KelasController::class)->parameters([
-    'kelas' => 'kls',
-]);
+    Route::resource('mahasiswa', MahasiswaController::class)
+        ->only(['index', 'show']);
 
-Route::resource('jadwal-kuliah', JadwalKuliahController::class);
+    Route::resource('dosen', DosenController::class)
+        ->only(['index', 'show']);
+
+    Route::resource('mata-kuliah', MataKuliahController::class)
+        ->only(['index', 'show']);
+
+    Route::resource('ruangan', RuanganController::class)
+        ->only(['index', 'show']);
+
+    Route::resource('kelas', KelasController::class)
+        ->parameters([
+            'kelas' => 'kls',
+        ])
+        ->only(['index', 'show']);
+
+    Route::resource('jadwal-kuliah', JadwalKuliahController::class)
+        ->only(['index', 'show']);
+});

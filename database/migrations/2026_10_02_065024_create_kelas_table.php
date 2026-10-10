@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('kelas', function (Blueprint $table): void {
             $table->id();
             $table->string('nama_kelas', 50);
-            $table->unsignedTinyInteger('angkatan');
+            $table->unsignedSmallInteger('angkatan');
             $table->string('jurusan', 100);
             $table->timestamps();
         });

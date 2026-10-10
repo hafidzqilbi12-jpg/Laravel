@@ -11,7 +11,22 @@
 </head>
 
 <body>
-    <h1>Data Dosen</h1> @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('dosen.create') }}">Tambah Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
+    <h1>Data Dosen</h1>
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('dosen.create') }}">Tambah Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
     <table>
         <thead>
             <tr>
@@ -31,8 +46,13 @@
                 <td>{{ $dsn->bidang_keahlian }}</td>
                 <td>{{ $dsn->email }}</td>
                 <td>{{ $dsn->no_telepon }}</td>
-                <td> <a href="{{ route('dosen.edit', $dsn->id) }}" class="btn">Ubah</a>
+                <td>
+                    @role('admin')
+                    <a href="{{ route('dosen.edit', $dsn->id) }}" class="btn">Ubah</a>
                     <form action="{{ route('dosen.destroy', $dsn->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus data dosen ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
             </tr> @empty <tr>
                 <td colspan="7">Belum ada data dosen.</td>

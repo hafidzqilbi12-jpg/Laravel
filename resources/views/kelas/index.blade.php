@@ -11,7 +11,22 @@
 </head>
 
 <body>
-    <h1>Data Kelas</h1> @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('kelas.create') }}">Tambah Kelas</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
+    <h1>Data Kelas</h1>
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('kelas.create') }}">Tambah Kelas</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
     <table>
         <thead>
             <tr>
@@ -27,8 +42,13 @@
                 <td>{{ $k->nama_kelas }}</td>
                 <td>{{ $k->angkatan }}</td>
                 <td>{{ $k->jurusan }}</td>
-                <td> <a href="{{ route('kelas.edit', $k->id) }}" class="btn">Ubah</a>
+                <td>
+                    @role('admin')
+                    <a href="{{ route('kelas.edit', $k->id) }}" class="btn">Ubah</a>
                     <form action="{{ route('kelas.destroy', $k->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus data kelas ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
             </tr> @empty <tr>
                 <td colspan="5">Belum ada data kelas.</td>

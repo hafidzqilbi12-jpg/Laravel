@@ -13,7 +13,22 @@
 </head>
 
 <body>
-    <h1>Jadwal Kuliah</h1> @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('jadwal-kuliah.create') }}">Tambah Jadwal</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> </p>
+    <h1>Jadwal Kuliah</h1>
+    @auth
+    <div style="text-align: right; margin-bottom: 20px;">
+        <span>
+            Login sebagai: {{ auth()->user()->name }}
+        </span>
+
+        <form method="POST"
+            action="{{ route('logout') }}"
+            style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    @endauth
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('jadwal-kuliah.create') }}">Tambah Jadwal</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('mata-kuliah.index') }}">Mata Kuliah</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> </p>
     <table>
         <thead>
             <tr>
@@ -35,8 +50,13 @@
                 <td>{{ $jk->ruangan->nama }} ({{ $jk->ruangan->kode_ruangan }})</td>
                 <td>{{ $jk->hari }}</td>
                 <td>{{ substr($jk->jam_mulai, 0, 5) }} - {{ substr($jk->jam_selesai, 0, 5) }}</td>
-                <td> <a href="{{ route('jadwal-kuliah.edit', $jk->id) }}" class="btn">Ubah</a>
+                <td>
+                    @role('admin')
+                    <a href="{{ route('jadwal-kuliah.edit', $jk->id) }}" class="btn">Ubah</a>
                     <form action="{{ route('jadwal-kuliah.destroy', $jk->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
+                    @else
+                    <span>-</span>
+                    @endrole
                 </td>
             </tr> @empty <tr>
                 <td colspan="8">Belum ada jadwal kuliah.</td>
