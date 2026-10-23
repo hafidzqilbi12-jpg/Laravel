@@ -47,4 +47,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function firstAccessibleMenuUrl(): string
+    {
+        foreach (config('menu', []) as $menu) {
+            if ($this->can($menu['permission']) && $this->can('lihat-data')) {
+                return route($menu['route']);
+            }
+        }
+
+        return route('login');
+    }
 }

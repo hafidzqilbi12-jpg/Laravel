@@ -13,7 +13,9 @@
 </head>
 
 <body>
-    <h1>Ubah Jadwal Kuliah</h1> @if ($errors->any()) <ul class="errors"> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul> @endif <form action="{{ route('jadwal-kuliah.update', $jadwal_kuliah->id) }}" method="POST"> @csrf @method('PUT') <p> <label for="kelas_id">Kelas</label><br> <select id="kelas_id" name="kelas_id" required>
+    <h1>Ubah Jadwal Kuliah</h1>
+
+    @include('partials.nav') @if ($errors->any()) <ul class="errors"> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul> @endif <form action="{{ route('jadwal-kuliah.update', $jadwal_kuliah->id) }}" method="POST"> @csrf @method('PUT') <p> <label for="kelas_id">Kelas</label><br> <select id="kelas_id" name="kelas_id" required>
                 <option value="">-- Pilih Kelas --</option> @foreach ($kelas as $k) <option value="{{ $k->id }}" {{ old('kelas_id', $jadwal_kuliah->kelas_id) == $k->id ? 'selected' : '' }}> {{ $k->nama_kelas }} </option> @endforeach
             </select> </p>
         <p> <label for="mata_kuliah_id">Mata Kuliah</label><br> <select id="mata_kuliah_id" name="mata_kuliah_id" required>

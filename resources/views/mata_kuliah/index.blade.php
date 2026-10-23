@@ -12,21 +12,10 @@
 
 <body>
     <h1>Data Mata Kuliah</h1>
-    @auth
-    <div style="text-align: right; margin-bottom: 20px;">
-        <span>
-            Login sebagai: {{ auth()->user()->name }}
-        </span>
-
-        <form method="POST"
-            action="{{ route('logout') }}"
-            style="display: inline;">
-            @csrf
-            <button type="submit">Logout</button>
-        </form>
-    </div>
-    @endauth
-    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif <p> <a href="{{ route('mata-kuliah.create') }}">Tambah Mata Kuliah</a> | <a href="{{ route('dosen.index') }}">Data Dosen</a> | <a href="{{ route('mahasiswa.index') }}">Data Mahasiswa</a> | <a href="{{ route('ruangan.index') }}">Ruangan</a> | <a href="{{ route('kelas.index') }}">Kelas</a> | <a href="{{ route('jadwal-kuliah.index') }}">Jadwal Kuliah</a> </p>
+    @if (session('success')) <p class="success">{{ session('success') }}</p> @endif @include('partials.nav')
+    @if (auth()->user()->can('tambah-data'))
+    <p><a href="{{ route('mata-kuliah.create') }}" class="btn">Tambah Mata Kuliah</a></p>
+    @endif
     <table>
         <thead>
             <tr>
@@ -45,12 +34,13 @@
                 <td>{{ $mk->sks }}</td>
                 <td>{{ $mk->semester }}</td>
                 <td>
-                    @role('admin')
+                    @if (auth()->user()->can('ubah-data'))
                     <a href="{{ route('mata-kuliah.edit', $mk->id) }}" class="btn">Ubah</a>
-                    <form action="{{ route('mata-kuliah.destroy', $mk->id) }}" method="POST" style="display: inline" onsubmit="return confirm('Yakin ingin menghapus data mata kuliah ini?')"> @csrf @method('DELETE') <button type="submit">Hapus</button> </form>
-                    @else
-                    <span>-</span>
-                    @endrole
+                    @endif
+                    @if (auth()->user()->can('hapus-data'))
+                    <form action="{{ route('mata-kuliah.destroy', $mk->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Yakin ingin menghapus data mata kuliah ini?')">@csrf @method('DELETE')<button type="submit">Hapus</button></form>
+                    @endif
+                    @if (!auth()->user()->can('ubah-data') && !auth()->user()->can('hapus-data')) <span>-</span> @endif
                 </td>
             </tr> @empty <tr>
                 <td colspan="6">Belum ada data mata kuliah.</td>

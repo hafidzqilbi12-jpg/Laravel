@@ -11,14 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // User yang sudah login diarahkan ke halaman mahasiswa
-        $middleware->redirectUsersTo(fn() => route('mahasiswa.index'));
+        // User yang sudah login diarahkan ke menu yang boleh diakses
+        $middleware->redirectUsersTo(
+            fn($request) => $request->user()->firstAccessibleMenuUrl()
+        );
 
         $middleware->alias([
-        'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
-        'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-        'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-    ]);
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

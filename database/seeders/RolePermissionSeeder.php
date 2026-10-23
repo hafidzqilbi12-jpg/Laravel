@@ -6,35 +6,71 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Permission dasar
-        $permissions = ['lihat-data', 'tambah-data', 'ubah-data', 'hapus-data'];
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        foreach ($permissions as $p) {
-            Permission::firstOrCreate(['name' => $p]);
+        // Hak akses dasar untuk melihat, menambah, mengubah, dan menghapus data.
+        $permissions = [
+            'lihat-data',
+            'tambah-data',
+            'ubah-data',
+            'hapus-data',
+            'menu-mahasiswa',
+            'menu-dosen',
+            'menu-mata-kuliah',
+            'menu-ruangan',
+            'menu-kelas',
+            'menu-jadwal-kuliah',
+            'menu-role',
+            'menu-pengguna',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ]);
         }
 
-        // Role admin -> semua permission
-        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
-        $roleAdmin->syncPermissions($permissions);
+        // Admin memiliki semua permission.
+        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $admin->syncPermissions($permissions);
 
-        // Role mahasiswa -> hanya lihat
-        $roleMhs = Role::firstOrCreate(['name' => 'mahasiswa']);
-        $roleMhs->syncPermissions(['lihat-data']);
+        // Dosen: contoh hanya Mata Kuliah dan Jadwal Kuliah.
+        $dosen = Role::firstOrCreate(['name' => 'dosen', 'guard_name' => 'web']);
+        $dosen->syncPermissions([
+            'lihat-data',
+            'menu-mata-kuliah',
+            'menu-jadwal-kuliah',
+        ]);
 
-        // User default
+        // Mahasiswa: hanya melihat Jadwal Kuliah.
+        $mahasiswa = Role::firstOrCreate(['name' => 'mahasiswa', 'guard_name' => 'web']);
+        $mahasiswa->syncPermissions([
+            'lihat-data',
+            'menu-jadwal-kuliah',
+        ]);
+
         User::firstOrCreate(
             ['email' => 'admin@example.test'],
             ['name' => 'Administrator', 'password' => 'password']
         )->syncRoles(['admin']);
 
         User::firstOrCreate(
+            ['email' => 'dosen@example.test'],
+            ['name' => 'Dosen Demo', 'password' => 'password']
+        )->syncRoles(['dosen']);
+
+        User::firstOrCreate(
             ['email' => 'mahasiswa@example.test'],
             ['name' => 'Mahasiswa Demo', 'password' => 'password']
         )->syncRoles(['mahasiswa']);
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

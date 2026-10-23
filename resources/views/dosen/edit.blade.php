@@ -13,7 +13,9 @@
 </head>
 
 <body>
-    <h1>Ubah Data Dosen</h1> @if ($errors->any()) <ul class="errors"> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul> @endif <form action="{{ route('dosen.update', $dosen->id) }}" method="POST"> @csrf @method('PUT') <p> <label for="nidn">NIDN</label><br> <input type="text" id="nidn" name="nidn" value="{{ old('nidn', $dosen->nidn) }}" maxlength="20" required> </p>
+    <h1>Ubah Data Dosen</h1>
+
+    @include('partials.nav') @if ($errors->any()) <ul class="errors"> @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach </ul> @endif <form action="{{ route('dosen.update', $dosen->id) }}" method="POST"> @csrf @method('PUT') <p> <label for="nidn">NIDN</label><br> <input type="text" id="nidn" name="nidn" value="{{ old('nidn', $dosen->nidn) }}" maxlength="20" required> </p>
         <p> <label for="nama">Nama</label><br> <input type="text" id="nama" name="nama" value="{{ old('nama', $dosen->nama) }}" maxlength="100" required> </p>
         <p> <label for="bidang_keahlian">Bidang Keahlian</label><br> <input type="text" id="bidang_keahlian" name="bidang_keahlian" value="{{ old('bidang_keahlian', $dosen->bidang_keahlian) }}" maxlength="100" required> </p>
         <p> <label for="email">Email</label><br> <input type="email" id="email" name="email" value="{{ old('email', $dosen->email) }}" maxlength="100"> </p>
